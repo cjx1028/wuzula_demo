@@ -1,10 +1,10 @@
-//demoç¨‹åºï¼Œç”¨äºä»‹ç»wuzulaå¼€å‘æ¡†æ¶ä¸‹å„ç§å¸¸ç”¨åŠŸèƒ½çš„ä½¿ç”¨
-//1ã€æ•°æ®åº“å¢åˆ æ”¹æŸ¥
-//æŠ¥æ–‡å­—æ®µçš„ä½¿ç”¨ï¼ˆæŠ¥æ–‡çš„è§£æå’Œç»„è£…æ˜¯åœ¨æ•°æ®åº“å¯¹åº”è¡¨ä¸­é€šè¿‡æ•°æ®é…ç½®å®Œæˆçš„ï¼‰
-//å­—ç¬¦ä¸²å¸¸ç”¨æ“ä½œ
+//demo³ÌĞò£¬ÓÃÓÚ½éÉÜwuzula¿ª·¢¿ò¼ÜÏÂ¸÷ÖÖ³£ÓÃ¹¦ÄÜµÄÊ¹ÓÃ
+//1¡¢Êı¾İ¿âÔöÉ¾¸Ä²é
+//±¨ÎÄ×Ö¶ÎµÄÊ¹ÓÃ£¨±¨ÎÄµÄ½âÎöºÍ×é×°ÊÇÔÚÊı¾İ¿â¶ÔÓ¦±íÖĞÍ¨¹ıÊı¾İÅäÖÃÍê³ÉµÄ£©
+//×Ö·û´®³£ÓÃ²Ù×÷
 //
-//å¦‚ä½•è°ƒç”¨å…¶ä»–äº¤æ˜“
-//å¦‚ä½•è°ƒç”¨å¤–éƒ¨äº¤æ˜“
+//ÈçºÎµ÷ÓÃÆäËû½»Ò×
+//ÈçºÎµ÷ÓÃÍâ²¿½»Ò×
 //
 
 
@@ -20,10 +20,11 @@
 
 static const char * _gpcDemoSQL0 = "select * from tserver where id='%s' ";
 static const char * _gpcDemoSQL1 = "select * from tserver ";
+static const char * _gpcDemoSQL2 = "insert into tserver values ('demoid', 'DEMO²âÊÔ', 1, 5, '0100000', '50:50:50')";
 
 
 
-// è¿™æ˜¯æ¯ä¸€ä¸ªç‹¬ç«‹çš„åº”ç”¨ç¨‹åºï¼ˆåŠ¨æ€é“¾æ¥åº“ï¼‰éƒ½å¿…é¡»è¦æœ‰çš„ï¼Œåˆå§‹åŒ–æ—¶è°ƒç”¨
+// ÕâÊÇÃ¿Ò»¸ö¶ÀÁ¢µÄÓ¦ÓÃ³ÌĞò£¨¶¯Ì¬Á´½Ó¿â£©¶¼±ØĞëÒªÓĞµÄ£¬³õÊ¼»¯Ê±µ÷ÓÃ
 extern "C" int _appSTART()
 {
     loginfo("_appstart~");
@@ -34,20 +35,20 @@ extern "C" int _appSTART()
 
 extern "C" int bizDEMO01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 {
-    //ä½¿ç”¨ç›¸å¯¹åŸç”Ÿè¯­å¥çš„æ–¹å¼
-    //æŸ¥è¯¢ä¸€æ¡è®°å½•çš„æ–¹å¼
+    //Ê¹ÓÃÏà¶ÔÔ­ÉúÓï¾äµÄ·½Ê½
+    //²éÑ¯Ò»Ìõ¼ÇÂ¼µÄ·½Ê½
     SP_Row row;
     dao.select(row, _gpcDemoSQL0, "biz.term");
-    M_THROW_MY_ERROR(row.null(), 44, "è·å–ä¸åˆ°æ•°æ® ");
+    M_THROW_MY_ERROR(row.null(), 44, "»ñÈ¡²»µ½Êı¾İ ");
     char * id = row->get("ID");
     char * name = row->get("NAME");
     int  max  = row->getInt("MAX");
     loginfo("id=[%s], name=[%s], max=[%d]", id, name, max);
 
-    //æŸ¥è¯¢å¤šæ¡è®°å½•çš„æ–¹å¼
+    //²éÑ¯¶àÌõ¼ÇÂ¼µÄ·½Ê½
     std::vector<SP_Row> rows;
     dao.select(0, rows, _gpcDemoSQL1);
-    //å¦‚æœæ˜¯å¸¦æœ‰æ¡ä»¶å‚æ•°çš„sqlï¼Œä¹Ÿå¯ä»¥ä½¿ç”¨å¦‚ä¸‹æ–¹å¼
+    //Èç¹ûÊÇ´øÓĞÌõ¼ş²ÎÊıµÄsql£¬Ò²¿ÉÒÔÊ¹ÓÃÈçÏÂ·½Ê½
     // dao.select(0, rows, _gpcDemoSQL, "lalalala");
     for (int i=0; i<rows.size(); ++i){
         char * id = rows[i]->get("ID");
@@ -56,12 +57,16 @@ extern "C" int bizDEMO01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
     }
 
 
-
-
     //update
+    //²»²Ù×÷ÊÂÎñÊ±Ä¬ÈÏcommit
+    dao.update(_gpcDemoSQL2);
 
-    //ä½¿ç”¨CDaoUtilæ–¹å¼ï¼Œå¯¹æ•°æ®åº“æ“ä½œè¿›è¡Œäº†è¿›ä¸€æ­¥çš„å°è£…
-    //æŸ¥è¯¢
+    //ÊÂÎñ¿ªÆôºÍ½áÊø
+    dao.beginXA();
+    dao.endXA();
+
+    //Ê¹ÓÃCDaoUtil·½Ê½£¬¶ÔÊı¾İ¿â²Ù×÷½øĞĞÁË½øÒ»²½µÄ·â×°
+    //²éÑ¯
 
 
     return 0;

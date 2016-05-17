@@ -35,7 +35,8 @@ extern "C" int _appSTART()
 
 extern "C" int bizDEMO01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 {
-    //使用相对原生语句的方式
+    //数据库操作
+    //1、使用相对原生语句的方式
     //查询一条记录的方式
     SP_Row row;
     dao.select(row, _gpcDemoSQL0, "biz.term");
@@ -57,16 +58,50 @@ extern "C" int bizDEMO01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
     }
 
 
-    //update
+    //update, 自然也包括了insert/delete
     //不操作事务时默认commit
-    dao.update(_gpcDemoSQL2);
+    //dao.update(_gpcDemoSQL2);
 
     //事务开启和结束
-    dao.beginXA();
-    dao.endXA();
+    //dao.beginXA();
+    //dao.endXA();
 
-    //使用CDaoUtil方式，对数据库操作进行了进一步的封装
+    //2、使用CDaoUtil方式，对数据库操作进行了进一步的封装
+    //注意：CMessage和CField两种类型基本可以通用。
     //查询
+    CDaoUtil * pDU = CDaoUtil::instance();
+    CMessage msg = new CMessage("test");
+    msg.set("ID", 1);//数据库字段名应都为大写
+    msg.set("NAME", "test");
+    SP_Row row1;
+    pDU->find(msg, dao, "ttest", row1);
+    row1->print();
+
+    //merge
+    //将数据库记录合并到数据域中
+    pDU->mergeRow(row1, msg);
+    msg.print();
+
+    //update
+    msg.set("NAME", "IamTest");
+    //pDU->update(msg, dao, "ttest", "id, name", false, NULL, "ID"); 
+    
+    //insert
+    msg.set("ID", 6);//数据库字段名应都为大写
+    msg.set("NAME", "唐长老");
+    //pDU->insert(msg, dao, "ttest");
+
+    //delete
+    msg.set("ID", 6);//数据库字段名应都为大写
+    msg.set("NAME", "唐长老");
+    //pDU->erase(msg, dao, "ttest", NULL, "ID");
+
+
+    //调用其他交易
+    
+
+    //常用数据结构
+
 
 
     return 0;

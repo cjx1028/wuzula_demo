@@ -134,9 +134,11 @@ extern "C" int bizDMOA01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
     rq1.copy(&msg,  "ID", "NAME", NULL);
     rq1.set("WHEREIAMFROM", "DMOA01");
     step1.call("cps", "DMOA02");
+    step1.pRqst_->print();
     step1.pRsp_->print();
     //2、被调用交易自行处理，不必返回数据，我处只做转发，则用msgForward方式
-    step1.forward("cps", "DMOA03");
+    CBpStepSub step2(&ctx);
+    step2.forward("cps", "DMOA03");
 
     //常用数据结构
 

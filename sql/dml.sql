@@ -4,7 +4,7 @@ delete from tfldcopy where chnlid = 'term.i';
 delete from tchnl where chnlid='term.i';
 delete from tpckctrl where chnlid = 'term.i';
 delete from troute where chnlid = 'term.i';
-delete from tpck where id = 'trmvbs.DEMO01';
+delete from tpck where id = 'trmvbs.DMOA01';
 delete from trspcdmap where chnlid='term.i';
 
 INSERT INTO tchnl(CHNLID, NAME, ISBINPCK, IOTYPE, ISPCKER, PCKWRAPPER, PCKIDXMODE, FLAGS, KEYFLDS1, KEYFLDS2, TIMEOUT, ID4RSPCD, RSPCD4OK, ID4RSPMSG, DEFAULTRSPCD, DEFAULTRSPMSG, ID4CHNLTRNCD)
@@ -32,11 +32,21 @@ INSERT INTO tdllpara(SERVERID, DLLID, ID, VALUE)
 INSERT INTO tfldcopy(CHNLID, TRNCD, FLDID, COPYAS)
   VALUES('term.i', '*', 'HEAD/TRNCD', NULL);
 INSERT INTO tpck(ID, CONVERT, PRE, POST, NAME, FILLSTYLE, FILLCHAR, TRIM, PCKMODE, MUST, OPT, REF, SIGNFLDID)
-  VALUES('trmvbs.DEMO01', 'vbs', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+  VALUES('trmvbs.DMOA01', 'vbs', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO tpck(ID, CONVERT, PRE, POST, NAME, FILLSTYLE, FILLCHAR, TRIM, PCKMODE, MUST, OPT, REF, SIGNFLDID)
+  VALUES('trmvbs.DMOA02', 'vbs', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO tpck(ID, CONVERT, PRE, POST, NAME, FILLSTYLE, FILLCHAR, TRIM, PCKMODE, MUST, OPT, REF, SIGNFLDID)
+  VALUES('trmvbs.DMOA03', 'vbs', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO tpckctrl(CHNLID, TRNCD, CHNLTRNCD, PACK, UNPACK, BYEXPR, BYEXPR4UN)
   VALUES('term.i', '*', NULL, 'trmvbs.all', 'trmvbs.all', NULL, '''trmvbs.all''');
 INSERT INTO troute(CHNLID, SYSID, TRNCD, DLLID, ROUTEFLDID, SERVERID)
-  VALUES('term.i', 'cps', '*', 'demo', NULL, 'biz.term');
+  VALUES('*', 'cps', 'DMO', 'demo', NULL, 'biz.term');
+-- 设置路由有几种方式，分别是 
+--*,       系统号,   交易号 
+--*,       系统号，  交易类（交易号前三位）
+--渠道号， 系统号，  *
+--*,       系统号，  *   这种方式还待后续验证
+
 INSERT INTO trspcdmap(RSPCD, CHNLID, RSPMSGLIKE, CHNLRSPCD, CHNLRSPMSG)
   VALUES(0, 'term.i', '0', '000000', '交易成功');
 INSERT INTO trspcdmap(RSPCD, CHNLID, RSPMSGLIKE, CHNLRSPCD, CHNLRSPMSG)

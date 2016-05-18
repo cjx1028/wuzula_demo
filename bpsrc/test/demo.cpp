@@ -33,7 +33,7 @@ extern "C" int _appSTART()
 }
 
 
-extern "C" int bizDEMO01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
+extern "C" int bizDMOA01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 {
     //数据库操作
     //1、使用相对原生语句的方式
@@ -128,11 +128,40 @@ extern "C" int bizDEMO01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
     loginfo("check if file is exist 2, iRet=[%d]", iRet);
 
     //调用其他交易
-    
+    //1、被调用交易处理完后，需要返回response给调用处用msgCall方式
+    CBpStepSub step1(&ctx);
+    CMessage & rq1 = *step1.pRqst_;
+    rq1.copy(&msg,  "ID", "NAME", NULL);
+    rq1.set("WHEREIAMFROM", "DMOA01");
+    step1.call("cps", "DMOA02");
+    step1.pRsp_->print();
+    //2、被调用交易自行处理，不必返回数据，我处只做转发，则用msgForward方式
+    step1.forward("cps", "DMOA03");
 
     //常用数据结构
 
 
+
+    return 0;
+}
+
+
+extern "C" int bizDMOA02(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
+{
+    loginfo("this is in bizDMOA02 transaction");
+    rq0.print();
+
+    rs0.set("MSG", "GOOD JOB, YOU HAVE DONE IT!");
+
+    return 0;
+}
+
+
+extern "C" int bizDMOA03(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
+{
+    loginfo("this is in bizDMOA03 transaction");
+    
+    rs0.set("MSG", "DMOA03 Finished!");
 
     return 0;
 }

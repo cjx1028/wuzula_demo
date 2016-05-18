@@ -97,6 +97,36 @@ extern "C" int bizDEMO01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
     //pDU->erase(msg, dao, "ttest", NULL, "ID");
 
 
+    //操作文件
+    //写文件
+    char filename[128];
+    memset(filename, 0, sizeof(filename));
+    snprintf(filename, sizeof(filename), "%s/logs/%s", _gpFrame->pcRunDir, "test.txt");
+
+    char * content  = "hi, this is a test \n\
+                             我们都说中国话";
+    int iRet = putInFile(filename, "w", content, strlen(content));
+    loginfo("putInFile, iRet=[%d], file=[%s]", iRet, filename);
+    //判断文件是否存在 
+    char dir[128];
+    char file[128];
+    memset(dir, 0, sizeof(dir));
+    sprintf(dir, "%s/", _gpFrame->pcRunDir);
+    sprintf(file, "logs/%s", "test.txt");
+    iRet = existFile( dir, file);
+    loginfo("check if file is exist 1, iRet=[%d]", iRet);
+
+    //读文件
+    char * buf;
+    getFileContent(filename, &buf);
+    loginfo("文件读内容如下：");
+    loginfo(buf);
+
+    //删除文件
+    removeFile(dir, file);
+    iRet = existFile( dir, file);
+    loginfo("check if file is exist 2, iRet=[%d]", iRet);
+
     //调用其他交易
     
 

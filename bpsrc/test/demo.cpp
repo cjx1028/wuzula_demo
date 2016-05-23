@@ -17,6 +17,7 @@
 #include "ifilepcker.h"
 #include "ifiletransfer.h"
 #include "idaoutil.h"
+#include "tcp.h"
 
 static const char * _gpcDemoSQL0 = "select * from tserver where id='%s' ";
 static const char * _gpcDemoSQL1 = "select * from tserver ";
@@ -147,7 +148,7 @@ extern "C" int bizDMOA01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
     return 0;
 }
 
-
+//被bizDMOA01调用的测试交易
 extern "C" int bizDMOA02(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 {
     loginfo("this is in bizDMOA02 transaction");
@@ -158,12 +159,55 @@ extern "C" int bizDMOA02(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
     return 0;
 }
 
-
+//被bizDMOA01调用的测试交易
 extern "C" int bizDMOA03(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 {
     loginfo("this is in bizDMOA03 transaction");
     
     rs0.set("MSG", "DMOA03 Finished!");
+    return 0;
+}
+
+
+//测试直接使用tcp socket方式来访问网络
+extern "C" int bizDMOA04(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
+{
+    loginfo("this is in bizDMOA04 transaction");
+    char * ip="127.0.0.1";
+    int  port=8008;
+
+    int sockfd = tcpINETConnect(ip, port);
+    M_THROW_MY_ERROR((sockfd <= 0), -1, "建立tcpINET连接失败");
+
+
+    int max = 10240; 
+    int lenprepck = 0;
+    char * pck = "this is my content";
+    int  pcklen = strlen(pck);
+    int bin = 0;
+
+    int iRet = 0;
+    if(lenprepck > 0) 
+        iRet = tcpPutData(sockfd, 0, lenprepck, bin, pck, pcklen);
+    else
+        iRet = tcpPutData(sockfd, max, lenprepck, bin, pck, pcklen);
+
+    char * rcvpck;
+    int rcvpcklen; 
+    long timeout = 10;//单位秒
+    if(lenprepck > 0) 
+        iRet = tcpGetData(sockfd, 0, lenprepck, bin, timeout, &rcvpck, &rcvpcklen);
+    else 
+        iRet = tcpGetData(sockfd, max, lenprepck, bin, timeout, &rcvpck, &rcvpcklen);
+
+    loginfo("recieved msg, len=[%06d], pck=[%s]", rcvpcklen, rcvpck);
+    //在tcpGetData内部，会进行内存申请，所以在用完后需要进行释放。
+    free(rcvpck);
+
+    rs0.set("MSG", "DMOA04 Finished!");
 
     return 0;
 }
+
+
+

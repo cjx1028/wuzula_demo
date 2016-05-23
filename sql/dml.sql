@@ -37,12 +37,14 @@ INSERT INTO tpck(ID, CONVERT, PRE, POST, NAME, FILLSTYLE, FILLCHAR, TRIM, PCKMOD
   VALUES('trmvbs.DMOA02', 'vbs', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO tpck(ID, CONVERT, PRE, POST, NAME, FILLSTYLE, FILLCHAR, TRIM, PCKMODE, MUST, OPT, REF, SIGNFLDID)
   VALUES('trmvbs.DMOA03', 'vbs', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO tpck(ID, CONVERT, PRE, POST, NAME, FILLSTYLE, FILLCHAR, TRIM, PCKMODE, MUST, OPT, REF, SIGNFLDID)
+  VALUES('trmvbs.DMOA04', 'vbs', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO tpckctrl(CHNLID, TRNCD, CHNLTRNCD, PACK, UNPACK, BYEXPR, BYEXPR4UN)
   VALUES('term.i', '*', NULL, 'trmvbs.all', 'trmvbs.all', NULL, '''trmvbs.all''');
 INSERT INTO troute(CHNLID, SYSID, TRNCD, DLLID, ROUTEFLDID, SERVERID)
   VALUES('*', 'cps', 'DMO', 'demo', NULL, 'biz.term');
--- 设置路由有几种方式，分别是 
---*,       系统号,   交易号 
+-- 设置路由有几种方式，分别是
+--*,       系统号,   交易号
 --*,       系统号，  交易类（交易号前三位）
 --渠道号， 系统号，  *
 --*,       系统号，  *   这种方式还待后续验证

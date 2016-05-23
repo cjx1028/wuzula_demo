@@ -33,7 +33,19 @@ extern "C" int _appSTART()
     return 0;
 }
 
+//常用数据类型的操作
+//数字进制转换操作
+//数字和字符串常用操作 common.c
+//编码、解码操作
+//数字格式化操作,特别是金额格式化操作
+//日期格式化操作
+extern "C" int bizDMOA00(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
+{
 
+}
+
+
+//数据库操作、文件操作和交易调用
 extern "C" int bizDMOA01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 {
     //数据库操作
@@ -211,3 +223,31 @@ extern "C" int bizDMOA04(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 
 
 
+//日志操作
+//程序中内存回收操作
+extern "C" int bizDMOA05(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
+{
+
+}
+
+
+//共享内存操作
+//加密、解密操作
+extern "C" int bizDMOA06(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
+{
+
+}
+
+
+//多线程操作
+extern "C" int bizDMOA07(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
+{
+
+}
+
+//hashtable
+//shared_ptr
+extern "C" int bizDMOA08(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
+{
+
+}

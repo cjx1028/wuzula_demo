@@ -18,6 +18,7 @@
 #include "ifiletransfer.h"
 #include "idaoutil.h"
 #include "tcp.h"
+#include "rs.h"
 
 static const char * _gpcDemoSQL0 = "select * from tserver where id='%s' ";
 static const char * _gpcDemoSQL1 = "select * from tserver ";
@@ -83,7 +84,9 @@ extern "C" int bizDMOA01(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
     //注意：CMessage和CField两种类型基本可以通用。
     //查询
     CDaoUtil * pDU = CDaoUtil::instance();
-    CMessage msg = new CMessage("test");
+    CMessage * pmsg = new CMessage("test");//参数无意义，关于CMessage的使用说明另外函数说明。
+    std::tr1::shared_ptr<CMessage> p(pmsg); //for free
+    CMessage msg = *pmsg;
     msg.set("ID", 1);//数据库字段名应都为大写
     msg.set("NAME", "test");
     SP_Row row1;
@@ -182,6 +185,7 @@ extern "C" int bizDMOA03(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 
 
 //测试直接使用tcp socket方式来访问网络
+//在other文件夹下，有python编写的testserver程序，可以做对应的测试
 extern "C" int bizDMOA04(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 {
     loginfo("this is in bizDMOA04 transaction");
@@ -224,12 +228,53 @@ extern "C" int bizDMOA04(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 
 
 //日志操作
-//程序中内存回收操作
+//程序中手工申请的内存回收操作
+//shared_ptr自动释放new申请的内存
+extern "C" void testSharedPtr1(std::tr1::shared_ptr<std::string> sp_str)
+{
+    //这里可以对sp_str指向的内容进行操作，不用再考虑内存释放的问题。
+    loginfo(sp_str->c_str());
+}
+extern "C" std::tr1::shared_ptr<std::string> testSharedPtr2()
+{
+    std::tr1::shared_ptr<std::string> sp_str(new std::string("hello world"));
+    
+    return sp_str;
+}
 extern "C" int bizDMOA05(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 {
+    //日志操作
+    int a = 10;
+    char * str="this is a test msg";
+
+    int level=LVL_INFO;
+    //在base.h中可以看到，系统中的日志级别有这五种
+    //LVL_DEBUG, LVL_INFO, LVL_WARN, LVL_ERROR, LVL_FATAL
+
+    logx(level, "logx[%d][%s]", a, str);
+    logdebug("logdebug[%d][%s]", a, str);
+    loginfo("loginfo[%d][%s]", a, str);
+    logwarn("logwarn[%d][%s]", a, str);
+    logerror("logerror[%d][%s]", a, str);
+    logdebug("logdebug[%d][%s]", a, str);
+
+    //-----------------------------------------------------------
+    //手工申请的内存，统一回收操作，可以免去手工free
+    CRsMngr rs;
+    char * pstr = (char *)malloc(1 * sizeof(char *));
+    rs.rec(pstr, freeHEAP);
+
+    //-----------------------------------------------------------
+    //对于跨函数使用的类，在使用new生成的情况下，根据情况可选择使用shared_ptr来取代手工delete操作。
+    //1、声明后传到其他函数中。
+    std::tr1::shared_ptr<std::string> sp_str(new std::string("hello world"));
+    testSharedPtr1(sp_str);
+
+    //2、在调用函数中生成，作为返回参数传回来。
+    std::tr1::shared_ptr<std::string> sp_str1;
+    sp_str1 = testSharedPtr2();
 
 }
-
 
 //共享内存操作
 //加密、解密操作
@@ -246,7 +291,6 @@ extern "C" int bizDMOA07(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 }
 
 //hashtable
-//shared_ptr
 extern "C" int bizDMOA08(CBpCtx & ctx, CMessage & rq0, CMessage & rs0)
 {
 
